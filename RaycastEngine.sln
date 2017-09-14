@@ -1,0 +1,27 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26730.15
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RaycastEngine", "RaycastEngine\RaycastEngine.csproj", "{42B8E572-3206-4CD7-B229-4CE9E446E305}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D5FDD3F2-05CB-40F9-A0EE-EB3A69A56AE5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{42B8E572-3206-4CD7-B229-4CE9E446E305}.Debug|x86.ActiveCfg = Debug|x86
+		{42B8E572-3206-4CD7-B229-4CE9E446E305}.Debug|x86.Build.0 = Debug|x86
+		{42B8E572-3206-4CD7-B229-4CE9E446E305}.Release|x86.ActiveCfg = Release|x86
+		{42B8E572-3206-4CD7-B229-4CE9E446E305}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D67DDDC1-E8E1-401F-BAE8-95D4CBA415BE}
+	EndGlobalSection
+EndGlobal
