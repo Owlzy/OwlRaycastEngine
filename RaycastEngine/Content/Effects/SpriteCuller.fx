@@ -1,4 +1,7 @@
-﻿#if OPENGL
+﻿/**
+* Owain Bell - 2017
+* */
+#if OPENGL
 #define SV_POSITION POSITION
 #define VS_SHADERMODEL vs_3_0
 #define PS_SHADERMODEL ps_3_0
@@ -31,29 +34,27 @@ VertexShaderOutput MainVS(in VertexShaderInput input)
 
 	output.Position = mul(input.Position, WorldViewProjection);
 	output.Color = input.Color;
-	output.TexCoord = output.Position.xy;
+	output.TexCoord = output.Position.xy / output.Position.w;
+	output.TexCoord = (output.TexCoord + 1) / 2;
+	output.TexCoord.y = 1 - output.TexCoord.y;
+	output.TexCoord.x *= 1920;
 
 	return output;
 }
 
 float4 main(VertexShaderOutput input) : COLOR0
 {
-	
 	int pixelX = input.TexCoord.x;
-	if (pixelX < startX)
-	{
-		input.Color.rgba *= 0.0f;
-	}
+	clip(pixelX - startX);
 
 	return input.Color;
-
 }
 
 technique BasicColorDrawing
 {
 	pass P0
 	{
-		VertexShader = compile vs_4_0_level_9_1 MainVS();
-		PixelShader = compile ps_4_0_level_9_1 main();
+		VertexShader = compile vs_4_0 MainVS();
+		PixelShader = compile ps_4_0 main();
 	}
 };
