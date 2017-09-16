@@ -10,8 +10,9 @@
 #define PS_SHADERMODEL ps_4_0_level_9_1
 #endif
 
-uniform int startX;
-uniform int endX;
+uniform float startXScreen;
+uniform float endX;
+uniform float viewWidth;
 
 matrix WorldViewProjection;
 
@@ -25,7 +26,7 @@ struct VertexShaderOutput
 {
 	float4 Position : SV_POSITION;
 	float4 Color : COLOR0;
-	float2 TexCoord : TEXCOORD0;
+	float2 ScreenPosition : TEXCOORD0;
 };
 
 VertexShaderOutput MainVS(in VertexShaderInput input)
@@ -34,19 +35,24 @@ VertexShaderOutput MainVS(in VertexShaderInput input)
 
 	output.Position = mul(input.Position, WorldViewProjection);
 	output.Color = input.Color;
-	output.TexCoord = output.Position.xy / output.Position.w;
-	output.TexCoord = (output.TexCoord + 1) / 2;
-	output.TexCoord.y = 1 - output.TexCoord.y;
-	output.TexCoord.x *= 1920;
+	output.ScreenPosition = output.Position.xy / output.Position.w;
 
 	return output;
 }
 
 float4 main(VertexShaderOutput input) : COLOR0
 {
-	int pixelX = input.TexCoord.x;
-	clip(pixelX - startX);
+	/*
+//	float2 scCoord = input.Position.xy / input.Position.w;
+	float2 tCoord = (scCoord + 1.0f) / 2.0f;//tex coord
+	tCoord.y = 1.0f - tCoord.y;//--
 
+	float2 pixel = tCoord * viewWidth;
+
+	clip(startX - pixel.x);
+	*/
+	if (input.ScreenPosition.x < startXScreen)
+		return 0;
 	return input.Color;
 }
 

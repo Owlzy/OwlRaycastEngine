@@ -12,6 +12,11 @@ using System.Text;
 using System.Threading.Tasks;
 using static RaycastEngine.MainGame;//annoying dependancy
 
+/**
+ * Class that represents a camera in terms of raycasting.  
+ * Contains methods to move the camera, and handles projection to,
+ * set the rectangle slice position and height,
+ */
 namespace RaycastEngine
 {
     class Camera
@@ -43,10 +48,10 @@ namespace RaycastEngine
         private static Rectangle[] s;
 
         //--move speed--//
-        private static double moveSpeed = 0.04;
+        private static double moveSpeed = 0.06;
 
         //--rotate speed--//
-        private static double rotSpeed = 0.02;
+        private static double rotSpeed = 0.03;
 
         //--cam x pre calc--//
         private static double[] camX;
@@ -71,7 +76,7 @@ namespace RaycastEngine
             upMap = map.getGridUp();
             midMap = map.getGridMid();
 
-            raycast();
+            raycast();//do an initial raycast
         }
 
         public void update()
@@ -126,8 +131,8 @@ namespace RaycastEngine
                 {
                     int[,] map;
                     if (i == 0) map = worldMap;
-                    else map = upMap;
-                    //if (i == Math.Floor(lvls.Length * 0.5)) map = midMap; //spooky glitch world
+                    else if (i == 1) map = midMap;
+                    else map = upMap;//if above lvl2 just keep extending up
                     castLevel(x, map, lvls[i].cts, lvls[i].sv, lvls[i].st, i);
                 }
             }
@@ -236,7 +241,9 @@ namespace RaycastEngine
             //int drawEnd = (lineHeight / 2 + h / 2);
 
             //texturing calculations
-            int texNum = grid[mapX, mapY] - 1; //1 subtracted from it so that texture 0 can be used!
+            int texNum = grid[mapX, mapY] - 1; //1 subtracted from it so that texture 0 can be used
+            if (texNum < 0) texNum = 0; //why?
+            lvls[levelNum].currTexNum[x] = texNum;
 
             //calculate value of wallX
             double wallX; //where exactly the wall was hit
@@ -248,6 +255,20 @@ namespace RaycastEngine
             int texX = (int)(wallX * texWidth);
             if (side == 0 && rayDirX > 0) texX = texWidth - texX - 1;
             if (side == 1 && rayDirY < 0) texX = texWidth - texX - 1;
+
+            //--some supid hacks to make the houses render correctly--//
+            if (side == 0)
+            {
+                if (texNum == 3)
+                    lvls[levelNum].currTexNum[x]++;
+                else if (texNum == 4)
+                    lvls[levelNum].currTexNum[x]--;
+
+                if (texNum == 1)
+                    lvls[levelNum].currTexNum[x] = 4;
+                else if (texNum == 2)
+                    lvls[levelNum].currTexNum[x] = 3;
+            }
 
             //--set current texture slice to be slice x--//
             _cts[x] = s[texX];
@@ -275,7 +296,7 @@ namespace RaycastEngine
             float lightFalloff = -100; //decrease value to make torch dimmer
 
             //--sun brightness, illuminates whole level--//
-            float sunLight = 200;//global illuminaion
+            float sunLight = 300;//global illuminaion
 
             //--distance based dimming of light--//
             float shadowDepth = (float)Math.Sqrt(perpWallDist) * lightFalloff;

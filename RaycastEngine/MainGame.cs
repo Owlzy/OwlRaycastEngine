@@ -4,6 +4,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 using System.Diagnostics;
 
 namespace RaycastEngine
@@ -14,7 +15,7 @@ namespace RaycastEngine
     public class MainGame : Game
     {
         //--set constant, texture size to be the wall (and sprite) texture size--//
-        private static int texSize = 128;
+        private static int texSize = 256;
 
         //--create slicer and declare slices--//
         private static TextureHandler slicer = new TextureHandler(texSize);
@@ -32,14 +33,17 @@ namespace RaycastEngine
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
 
+        Texture2D[] textures = new Texture2D[5];
+
         //--test texture--//
-        Texture2D texture;
+        Texture2D floor;
+        Texture2D sky;
 
         //-test effect--//
-        //Effect effect;
+        Effect effect;
 
         //test sprite
-        //Texture2D sprite;
+        Texture2D sprite;
 
         //--array of levels, levels reffer to "floors" of the world--//
         Level[] levels;
@@ -52,12 +56,19 @@ namespace RaycastEngine
 
             //--current slice tint (for lighting)--//
             public Color[] st;
+            public int[] currTexNum;
         }
 
         public MainGame()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+
+            graphics.GraphicsProfile = GraphicsProfile.HiDef;
+            graphics.PreferredBackBufferWidth = 1024;  // set these values to the desired width and height of your window 
+            graphics.PreferredBackBufferHeight = 700; // (if your computer struggles, either turn down number of levels rendered or turn this to something low, like 800 x 600)
+            // graphics.IsFullScreen = true;
+            graphics.ApplyChanges();
         }
 
         /// <summary>
@@ -68,13 +79,6 @@ namespace RaycastEngine
         /// </summary>
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
-
-            graphics.GraphicsProfile = GraphicsProfile.HiDef;
-            graphics.PreferredBackBufferWidth = 1920;  // set these values to the desired width and height of your window 
-            graphics.PreferredBackBufferHeight = 1080; // (if your computer struggles, either turn down number of levels rendered or turn this to something low, like 800 x 600)
-            graphics.ApplyChanges();
-
             //--get viewport--//
             view = graphics.GraphicsDevice.Viewport;
 
@@ -86,7 +90,7 @@ namespace RaycastEngine
             slices = slicer.getSlices();
 
             //--inits the levels--//
-            levels = createLevels(5);
+            levels = createLevels(4);
 
             //--init camera--//
             camera = new Camera(width, height, texSize, slices, levels);
@@ -104,10 +108,14 @@ namespace RaycastEngine
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             // TODO: use this.Content to load your game content here
+            textures[0] = getTexture("stone");
+            textures[1] = getTexture("left_bot_house");
+            textures[2] = getTexture("right_bot_house");
+            textures[3] = getTexture("left_top_house");
+            textures[4] = getTexture("right_top_house");
 
-            texture = getTexture("stone");
-            //effect = Content.Load<Effect>("Effects/SpriteCuller");
-            //sprite = getTexture("wood");
+            floor = getTexture("floor");
+            sky = getTexture("sky");
         }
 
         /// <summary>
@@ -131,11 +139,6 @@ namespace RaycastEngine
 
             // TODO: Add your update logic here
             camera.update();
-
-            //effect.Parameters["startX"].SetValue(34);
-            //effect.Parameters["endX"].SetValue(45);
-
-            base.Update(gameTime);
         }
 
         /// <summary>
@@ -146,28 +149,35 @@ namespace RaycastEngine
         {
             GraphicsDevice.Clear(Color.Black);
 
-            // TODO: Add your drawing code here
-            spriteBatch.Begin(SpriteSortMode.Immediate);
+            //--draw sky and floor--//
+            spriteBatch.Begin();
+            spriteBatch.Draw(floor,
+               new Rectangle(0, (int)(height * 0.5f), width, (int)(height * 0.5f)),
+               new Rectangle(0, 0, texSize, texSize),
+               Color.White);
+            spriteBatch.Draw(sky,
+            new Rectangle(0, 0, width, (int)(height * 0.5f)),
+            new Rectangle(0, 0, texSize, texSize),
+            Color.White);
+            spriteBatch.End();
+
+            //--draw walls--//
+            spriteBatch.Begin();
 
             for (int x = 0; x < width; x++)
             {
                 for (int i = levels.Length - 1; i >= 0; i--)
                 {
-                    spriteBatch.Draw(texture, levels[i].sv[x], levels[i].cts[x], levels[i].st[x]);
+                    spriteBatch.Draw(textures[levels[i].currTexNum[x]], levels[i].sv[x], levels[i].cts[x], levels[i].st[x]);
                 }
             }
 
             spriteBatch.End();
 
-            //--testing sprite--//
-            //   spriteBatch.Begin();
-            //   effect.CurrentTechnique.Passes[0].Apply();
-            //   spriteBatch.Draw(sprite, Vector2.Zero, Color.White);
-            //   spriteBatch.End();
-
             base.Draw(gameTime);
         }
 
+        //returns an initialised Level struct
         public Level[] createLevels(int numLevels)
         {
             Level[] arr = new Level[numLevels];
@@ -177,6 +187,12 @@ namespace RaycastEngine
                 arr[i].sv = SliceView();
                 arr[i].cts = new Rectangle[width];
                 arr[i].st = new Color[width];
+                arr[i].currTexNum = new int[width];
+
+                for (int j = 0; j < arr[i].currTexNum.Length; j++)
+                {
+                    arr[i].currTexNum[j] = 1;
+                }
             }
             return arr;
         }
