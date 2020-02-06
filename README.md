@@ -19,4 +19,4 @@ if anyone is intrestred in improving it.
 
 ![alt text](https://github.com/Owlzy/OwlRaycastEngine/blob/master/screenshot.PNG?raw=true)
 
-A video can be seen on my site under github projects - http://owlzdev.co.uk/
+https://www.youtube.com/watch?v=mX6k5XAzS8E&feature=emb_title - Youtube video.
