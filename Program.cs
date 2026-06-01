@@ -2,7 +2,6 @@
 
 namespace RaycastEngine
 {
-#if WINDOWS || LINUX
     /// <summary>
     /// The main class.
     /// </summary>
@@ -18,5 +17,4 @@ namespace RaycastEngine
                 game.Run();
         }
     }
-#endif
 }
